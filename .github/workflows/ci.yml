@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=4096"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Backend - install & test
+        working-directory: ./backend
+        run: |
+          npm ci
+          # si tu as des tests unitaires : npm test
+
+      - name: Frontend - install & build
+        working-directory: ./frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build backend Docker image
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/task-manager-backend:latest ./backend
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push image to GHCR
+        run: |
+          docker tag ghcr.io/${{ github.repository_owner }}/task-manager-backend:latest ghcr.io/${{ github.repository_owner }}/task-manager-backend:${{ github.sha }}
+          docker push ghcr.io/${{ github.repository_owner }}/task-manager-backend:${{ github.sha }}
