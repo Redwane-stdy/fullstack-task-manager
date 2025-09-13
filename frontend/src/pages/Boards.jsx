@@ -84,7 +84,7 @@ const Boards = () => {
             Mes Tableaux
           </h1>
           <p className="text-gray-600 mt-1">
-            Bienvenue, {user?.username || user?.email} ! Gérez vos projets ici.
+            Bienvenue ! Gérez vos projets ici.
           </p>
         </div>
         <button
