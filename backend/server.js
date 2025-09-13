@@ -71,7 +71,13 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/api/auth', authRoutes);
 app.use('/api/boards', boardsRoutes);
 app.use('/api/lists', listsRoutes);
+
+// Mount cards routes in two ways to support both patterns:
+// 1. For nested routes like /api/lists/:listId/cards
+app.use('/api', cardsRoutes);
+// 2. For direct routes like /api/cards/:id  
 app.use('/api/cards', cardsRoutes);
+
 app.use('/api/users', userRoutes);
 
 // Route de santé

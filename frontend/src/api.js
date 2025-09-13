@@ -1,4 +1,4 @@
-/* api.js - Version améliorée */
+// src/api.js
 import axios from "axios";
 
 const api = axios.create({
@@ -130,6 +130,39 @@ export const auth = {
     const user = localStorage.getItem('user');
     return user ? JSON.parse(user) : null;
   }
+};
+
+// -----------------------
+// Endpoints Boards / Lists / Cards
+// -----------------------
+// Assomption REST : base /api
+// Boards : /boards, /boards/:id
+// Lists (nested) : /boards/:boardId/lists, /lists/:id
+// Cards (nested) : /lists/:listId/cards, /cards/:id
+// Reorder endpoints: POST /boards/:boardId/lists/reorder { ordered: [...] }
+//                    POST /lists/:listId/cards/reorder { ordered: [...] }
+
+export const boardsAPI = {
+  list: () => api.get('/boards'),
+  get: (id) => api.get(`/boards/${id}`),
+  create: (payload) => api.post('/boards', payload),
+  update: (id, payload) => api.patch(`/boards/${id}`, payload),
+  remove: (id) => api.delete(`/boards/${id}`),
+};
+
+export const listsAPI = {
+  listForBoard: (boardId) => api.get(`/boards/${boardId}/lists`),
+  createForBoard: (boardId, payload) => api.post(`/boards/${boardId}/lists`, payload),
+  update: (listId, payload) => api.patch(`/lists/${listId}`, payload),
+  remove: (listId) => api.delete(`/lists/${listId}`),
+  reorderForBoard: (boardId, ordered) => api.post(`/boards/${boardId}/lists/reorder`, { ordered }),
+};
+
+export const cardsAPI = {
+  createForList: (listId, payload) => api.post(`/lists/${listId}/cards`, payload),
+  update: (cardId, payload) => api.patch(`/cards/${cardId}`, payload),
+  remove: (cardId) => api.delete(`/cards/${cardId}`),
+  reorderForList: (listId, ordered) => api.post(`/lists/${listId}/cards/reorder`, { ordered }),
 };
 
 export default api;
